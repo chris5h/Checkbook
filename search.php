@@ -7,7 +7,8 @@ $f = fopen('php://memory', 'w');
         fputcsv($f, $line, ','); 
     }
 fseek($f, 0);
+
 header('Content-Type: application/csv');
-header('Content-Disposition: attachment; filename="report.csv";');
+header('Content-Disposition: attachment; filename="'.str_replace("-","_", "{$_POST['from']} thru {$_POST['to']}").'.csv";');
 fpassthru($f);
 ?>
