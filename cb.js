@@ -34,7 +34,7 @@ function delTrans(){
   $.get("handler.php?type=deltrans&id="+$('#trans_id').val(), function(data, status){
     console.log(status);
   });
-  window.location.replace("<?= $_SERVER['PHP_SELF'] ?>");
+  window.location.replace(window.location.href);
 }
 
 function newTrans(){
