@@ -66,6 +66,7 @@ $balance = getBalance();
       <button class="btn btn-outline-primary nav_bar" onclick="window.location = window.location['href']"> 🏠 Home </button>
       <button class="btn btn-outline-dark nav_bar" onclick="newTrans()"> ➕ Add </button>
       <button class="btn btn-outline-danger nav_bar" onclick="$('#searchModal').modal('show')"> 🔍 Search </button>
+      <button class="btn btn-outline-success nav_bar" onclick="window.location = 'sched.php'"> 📅 Schedule </button>
     </div>
   </div>
 </div>

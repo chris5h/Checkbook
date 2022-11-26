@@ -1,39 +1,68 @@
--- --------------------------------------------------------
--- Host:                         127.0.0.1
--- Server version:               10.8.3-MariaDB-1:10.8.3+maria~jammy - mariadb.org binary distribution
--- Server OS:                    debian-linux-gnu
--- HeidiSQL Version:             12.0.0.6468
--- --------------------------------------------------------
+CREATE TABLE `transactions` (
+	`id` INT(11) NOT NULL AUTO_INCREMENT,
+	`created_dt` DATETIME NOT NULL DEFAULT current_timestamp(),
+	`trans_date` DATE NOT NULL,
+	`description` VARCHAR(1024) NOT NULL,
+	`amount` DECIMAL(9,2) NOT NULL,
+	`checknumber` INT(11) NULL DEFAULT NULL,
+	`schedule_id` INT(11) NULL DEFAULT NULL,
+	PRIMARY KEY (`id`)
+);
 
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET NAMES utf8 */;
-/*!50503 SET NAMES utf8mb4 */;
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE='+00:00' */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+CREATE TABLE `schedule` (
+	`id` INT(11) NOT NULL AUTO_INCREMENT,
+	`created_dt` DATETIME NOT NULL DEFAULT current_timestamp(),
+	`dayofmonth` INT(11) NOT NULL,
+	`amount` DECIMAL(9,2) NOT NULL,
+	`description` VARCHAR(1024) NOT NULL,
+	`active` BIT(1) NOT NULL DEFAULT b'1',
+	PRIMARY KEY (`id`)
+);
+
+CREATE VIEW scheduledtransactions AS
+SELECT
+	`b`.`nextrun` AS `nextrun`,
+	`b`.`description` AS `description`,
+	`b`.`amount` AS `amount`,
+	`b`.`id` AS `id`
+FROM (
+	(
+		select 
+			`s`.`id` AS `id`,
+			`s`.`created_dt` AS `created_dt`,
+			`s`.`dayofmonth` AS `dayofmonth`,
+			`s`.`amount` AS `amount`,
+			`s`.`description` AS `description`,		
+			`s`.`active` AS `active`,
+			str_to_date(concat(month(curdate()) + if(dayofmonth(curdate()) > `s`.`dayofmonth`,1,0),',',`s`.`dayofmonth`,',',year(curdate())),'%m,%d,%Y') AS `nextrun` 
+		from `schedule` `s` where `s`.`active` = 1
+	) `b` left join `transactions` `t` ON 
+		(
+			`t`.`trans_date` = `b`.`nextrun` and `b`.`id` = `t`.`schedule_id`
+		)
+	) where `t`.`id` is null and `b`.`nextrun` between curdate() and CURDATE() + interval 6 DAY;
+
+SET GLOBAL event_scheduler = ON;
+
+DELIMITER //
+
+CREATE PROCEDURE InsertScheduledTrans()
+BEGIN
+	INSERT INTO transactions (`trans_date`, `description`, `amount`, `schedule_id`)
+	SELECT
+		s.nextrun,
+		s.description,	
+		s.amount,
+		s.id
+	FROM scheduledtransactions s;
+END //
+
+DELIMITER ;
 
 
--- Dumping database structure for checkbook
-CREATE DATABASE IF NOT EXISTS `checkbook` /*!40100 DEFAULT CHARACTER SET utf8mb4 */;
-USE `checkbook`;
-
--- Dumping structure for table checkbook.transactions
-CREATE TABLE IF NOT EXISTS `transactions` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `created_dt` datetime NOT NULL DEFAULT current_timestamp(),
-  `trans_date` date NOT NULL,
-  `description` varchar(1024) NOT NULL,
-  `amount` decimal(9,2) NOT NULL,
-  `checknumber` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=14091 DEFAULT CHARSET=utf8mb4;
-
--- Data exporting was unselected.
-
-/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
-/*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
-/*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40111 SET SQL_NOTES=IFNULL(@OLD_SQL_NOTES, 1) */;
+CREATE EVENT event_name
+	ON SCHEDULE
+		EVERY 1 DAY
+		STARTS (TIMESTAMP(CURRENT_DATE) + INTERVAL 1 DAY + INTERVAL 1 HOUR)
+	DO
+		CALL InsertScheduledTrans;

@@ -64,6 +64,20 @@ function getTrans($id){
     }
 }
 
+function getSched($id){
+    global $link;
+    $sql = "SELECT *, str_to_date(concat(month(curdate()) + if(dayofmonth(curdate()) > s.dayofmonth,1,0),',',s.dayofmonth,',',year(curdate())),'%m,%d,%Y') AS `nextrun` FROM `schedule` s where s.id = ?";
+    if($stmt = mysqli_prepare($link, $sql)){
+        mysqli_stmt_bind_param($stmt, "i", $id);
+        if(mysqli_stmt_execute($stmt)){
+            $result = mysqli_stmt_get_result($stmt);
+            while ($row = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
+                return $row;
+            }
+        }
+    }
+}
+
 function newTrans($date, $amount, $type, $des, $checknumber){
     global $link;
     $amount = $type == 'withdrawal' ? 0-$amount : $amount;
@@ -71,6 +85,32 @@ function newTrans($date, $amount, $type, $des, $checknumber){
     $sql = "INSERT INTO transactions (trans_date, description, amount, checknumber) VALUES (?,?,?,?)";
     $stmt = mysqli_prepare($link, $sql);
     mysqli_stmt_bind_param($stmt, "ssss", $date, $des, $amount, $checknumber);
+    mysqli_stmt_execute($stmt);
+}
+
+function newSchedule($dayofmonth, $amount, $active, $desc){
+    global $link;
+    $amount =  0 - $amount;
+    $sql = "INSERT INTO schedule (`dayofmonth`, `amount`,`description`,`active`) VALUES (?,?,?,?)";
+    $stmt = mysqli_prepare($link, $sql);
+    mysqli_stmt_bind_param($stmt, "issi", $dayofmonth, $amount, $desc, $active,);
+    mysqli_stmt_execute($stmt);
+}
+
+function editSchedule($dayofmonth, $amount, $active, $description, $id ){
+    global $link;
+    $amount = 0 - $amount;
+    $sql = "UPDATE schedule SET `dayofmonth` = ?, `amount` = ?, `description` = ?, `active` = ? WHERE id = ?";
+    $stmt = mysqli_prepare($link, $sql);
+    mysqli_stmt_bind_param($stmt, "issii", $dayofmonth, $amount, $description, $active, $id);
+    mysqli_stmt_execute($stmt);
+}
+
+function delSched($id){
+    global $link;
+    $sql = "delete from schedule WHERE id = ?";
+    $stmt = mysqli_prepare($link, $sql);
+    mysqli_stmt_bind_param($stmt, "i", $id);
     mysqli_stmt_execute($stmt);
 }
 
@@ -142,4 +182,18 @@ function searchTrans($arr){
         }
     }
     return $trans;
+}
+
+function getSchedule(){
+    global $link;
+    $sql = "SELECT *, str_to_date(concat(month(curdate()) + if(dayofmonth(curdate()) > s.dayofmonth,1,0),',',s.dayofmonth,',',year(curdate())),'%m,%d,%Y') AS `nextrun` FROM `schedule` s";
+    if($stmt = mysqli_prepare($link, $sql)){
+        if(mysqli_stmt_execute($stmt)){
+            $result = mysqli_stmt_get_result($stmt);
+            while ($row = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
+                $results[] = $row;
+            }
+        }
+    }    
+    return is_array($results) ? $results : false;
 }
