@@ -186,7 +186,7 @@ function searchTrans($arr){
 
 function getSchedule(){
     global $link;
-    $sql = "SELECT *, str_to_date(concat(month(curdate()) + if(dayofmonth(curdate()) > s.dayofmonth,1,0),',',s.dayofmonth,',',year(curdate())),'%m,%d,%Y') AS `nextrun` FROM `schedule` s";
+    $sql = "SELECT * FROM allschedules";
     if($stmt = mysqli_prepare($link, $sql)){
         if(mysqli_stmt_execute($stmt)){
             $result = mysqli_stmt_get_result($stmt);

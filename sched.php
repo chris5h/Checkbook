@@ -76,6 +76,7 @@ if ($_POST){
           <th>Amount</th>
           <th>Day of Month</th>
           <th>Next Run</th>
+          <th>Last Run</th>          
           <th>Enabled</th>
         </tr>
     </thead>
@@ -91,6 +92,7 @@ if ($_POST){
             <td class="<?= $line['amount'] < 0 ? 'negative' : 'positive' ?>">$<?= number_format($line['amount'],2,'.',',') ?></td>
             <td><?= $line['dayofmonth'] ?></td>
             <td><?= date('m/d/Y', strtotime($line['nextrun'])) ?></td>
+            <td><?= is_null($line['lastrun']) ? '' : date('m/d/Y', strtotime($line['lastrun'])) ?></td>
             <td><?= $line['active'] == 1 ? '✔️' : '🚫' ?></td>
         </tr>
         <?

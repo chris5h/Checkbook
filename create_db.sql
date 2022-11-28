@@ -42,6 +42,19 @@ FROM (
 		)
 	) where `t`.`id` is null and `b`.`nextrun` between curdate() and CURDATE() + interval 6 DAY;
 
+CREATE VIEW allschedules
+AS
+SELECT a.*, b.lastrun FROM (
+	SELECT 
+		*, 
+		str_to_date(concat(month(curdate()) + if(dayofmonth(curdate()) > s.dayofmonth,1,0),',',s.dayofmonth,',',year(curdate())),'%m,%d,%Y') AS `nextrun`
+	FROM `schedule` s
+) a LEFT JOIN (
+	SELECT schedule_id , MAX(t.trans_date) AS `lastrun` FROM transactions t 
+		WHERE t.schedule_id IS NOT NULL
+	GROUP BY t.schedule_id
+) b ON id = b.schedule_id;
+
 SET GLOBAL event_scheduler = ON;
 
 DELIMITER //
