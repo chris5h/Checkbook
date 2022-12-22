@@ -20,27 +20,27 @@ CREATE TABLE `schedule` (
 );
 
 CREATE VIEW scheduledtransactions AS
-SELECT
-	`b`.`nextrun` AS `nextrun`,
-	`b`.`description` AS `description`,
-	`b`.`amount` AS `amount`,
-	`b`.`id` AS `id`
-FROM (
-	(
-		select 
-			`s`.`id` AS `id`,
-			`s`.`created_dt` AS `created_dt`,
-			`s`.`dayofmonth` AS `dayofmonth`,
-			`s`.`amount` AS `amount`,
-			`s`.`description` AS `description`,		
-			`s`.`active` AS `active`,
-			str_to_date(concat(month(curdate()) + if(dayofmonth(curdate()) > `s`.`dayofmonth`,1,0),',',`s`.`dayofmonth`,',',year(curdate())),'%m,%d,%Y') AS `nextrun` 
-		from `schedule` `s` where `s`.`active` = 1
-	) `b` left join `transactions` `t` ON 
+	SELECT
+		`b`.`nextrun` AS `nextrun`,
+		`b`.`description` AS `description`,
+		`b`.`amount` AS `amount`,
+		`b`.`id` AS `id`
+	FROM (
 		(
-			`t`.`trans_date` = `b`.`nextrun` and `b`.`id` = `t`.`schedule_id`
-		)
-	) where `t`.`id` is null and `b`.`nextrun` between curdate() and CURDATE() + interval 6 DAY;
+			select 
+				`s`.`id` AS `id`,
+				`s`.`created_dt` AS `created_dt`,
+				`s`.`dayofmonth` AS `dayofmonth`,
+				`s`.`amount` AS `amount`,
+				`s`.`description` AS `description`,		
+				`s`.`active` AS `active`,
+				STR_TO_DATE(CONCAT(REPLACE(month(curdate()) + if(dayofmonth(curdate()) > `s`.`dayofmonth`,1,0),13,1),',',`s`.`dayofmonth`,',',year(curdate())),'%m,%d,%Y') AS `nextrun`
+			from `schedule` `s` where `s`.`active` = 1
+		) `b` left join `transactions` `t` ON 
+			(
+				`t`.`trans_date` = `b`.`nextrun` and `b`.`id` = `t`.`schedule_id`
+			)
+		) where `t`.`id` is null and `b`.`nextrun` between curdate() and CURDATE() + interval 6 DAY;
 
 CREATE VIEW allschedules
 AS
