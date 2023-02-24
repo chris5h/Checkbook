@@ -51,8 +51,9 @@ function delTrans(){
   console.log('delete '+id);
   $.get("handler.php?type=deltrans&id="+$('#trans_id').val(), function(data, status){
     console.log(status);
+  }).done(function(){
+    window.location.replace(window.location.href);
   });
-  window.location.replace(window.location.href);
 }
 
 function delSched(){
