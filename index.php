@@ -136,7 +136,7 @@ $balance = getBalance();
         <div class="input-group-prepend">
             <span class="input-group-text trans_header">Amount</span>
         </div>
-        <input type="number" id="amount" name="amount" min="0.01" step="0.01" class="form-control" required>
+        <input type="number" id="amount" name="amount" min="0.01" step="0.01" class="form-control" onchange="$(this).val(Math.abs($(this).val()))" required>
       </div>
 
       <div class="input-group mb-3">
@@ -210,11 +210,11 @@ $balance = getBalance();
           <div class="input-group-prepend">
             <span class="input-group-text">Amount Range</span>
           </div>
-          <input id="search_low" type="number" name="low" step="0.01" value="<?= $_POST['low'] ?>" class="form-control search_fields">
+          <input id="search_low" type="number" name="low" step="0.01" value="<?= $_POST['low'] ?>" class="form-control search_fields" onchange="$(this).val(Math.abs($(this).val()))">
           <div class="input-group-prepend">
             <span class="input-group-text">To</span>
           </div>
-          <input id="search_high" type="number" name="high" step="0.01" value="<?= $_POST['high'] ?>" class="form-control search_fields">
+          <input id="search_high" type="number" name="high" step="0.01" value="<?= $_POST['high'] ?>" class="form-control search_fields" onchange="$(this).val(Math.abs($(this).val()))">
         </div>
 
         <div class="input-group mb-3">

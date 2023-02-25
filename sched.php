@@ -137,7 +137,7 @@ if ($_POST){
         <div class="input-group-prepend">
             <span class="input-group-text trans_header">Amount</span>
         </div>
-        <input type="number" id="amount" name="amount" min="0.01" step="0.01" class="form-control" required>
+        <input type="number" id="amount" name="amount" min="0.01" step="0.01" class="form-control" required onchange="$(this).val(Math.abs($(this).val()))">
       </div>
 
       <div class="input-group mb-3">
