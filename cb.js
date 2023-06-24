@@ -1,9 +1,9 @@
 $(document).ready( function () {
   $('#trans_table').DataTable({
-    searching: false,
-    ordering:  false
+      searching: false,
+      ordering:  false
+  });  
 });
-} );
 
 function editTrans(id){
   $('#type').val('edit');
@@ -94,7 +94,19 @@ function newSched(){
   setWidth('buttongrp');
 }
 
+function validateForm(){
+  var from = $('#search_from').val();
+  var to = $('#search_to').val();
+  if (to < from){
+    alert("From date must be less than or equal to To date.");
+    return false;
+  }
+}
+
 function exportCSV(){
+  if (!validateForm()){
+    return false;
+  }  
   document.getElementById('search_form').action = "search.php";
   document.getElementById('search_form').submit();
   document.getElementById('search_form').action = "";

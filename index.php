@@ -65,7 +65,7 @@ $balance = getBalance();
     <div class="card-footer"><div class="btn-group input-group" role="group">
       <button class="btn btn-outline-primary nav_bar" onclick="window.location = window.location['href']"> 🏠 Home </button>
       <button class="btn btn-outline-dark nav_bar" onclick="newTrans()"> ➕ Add </button>
-      <button class="btn btn-outline-danger nav_bar" onclick="$('#searchModal').modal('show')"> 🔍 Search </button>
+      <button class="btn btn-outline-danger nav_bar" onclick="$('#searchModal').modal('show');setWidth('date_header');"> 🔍 Search </button>
       <button class="btn btn-outline-success nav_bar" onclick="window.location = 'sched.php'"> 📅 Schedule </button>
     </div>
   </div>
@@ -184,7 +184,7 @@ $balance = getBalance();
 
       <!-- Modal body -->
       <div class="modal-body">
-      <form method="post" id="search_form">
+      <form method="post" id="search_form"  onsubmit="return validateForm()" >
         <input type="hidden" name="type" value="search">
         <div class="input-group" style="border-radius: 0px !important;">
           <div class="input-group-prepend">
@@ -201,14 +201,14 @@ $balance = getBalance();
 
         <div class="input-group mb-3">
           <div class="input-group-prepend">
-            <span class="input-group-text">Description</span>
+            <span class="input-group-text date_header">Description</span>
           </div>
           <input id="search_description" type="text" name="description" value="<?= $_POST['desc'] ?>" class="form-control search_fields">
         </div>
         
         <div class="input-group mb-3">
           <div class="input-group-prepend">
-            <span class="input-group-text">Amount Range</span>
+            <span class="input-group-text date_header">Amount Range</span>
           </div>
           <input id="search_low" type="number" name="low" step="0.01" value="<?= $_POST['low'] ?>" class="form-control search_fields" onchange="$(this).val(Math.abs($(this).val()))">
           <div class="input-group-prepend">
@@ -219,7 +219,7 @@ $balance = getBalance();
 
         <div class="input-group mb-3">
           <div class="input-group-prepend">
-            <span class="input-group-text">Check Numbers</span>
+            <span class="input-group-text date_header">Check Numbers</span>
           </div>
           <input id="check_low" type="number" name="check_low" step="1" value="<?= $_POST['check_low'] ?>" class="form-control search_fields">
           <div class="input-group-prepend">
