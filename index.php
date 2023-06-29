@@ -187,16 +187,18 @@ $balance = getBalance();
       <form method="post" id="search_form"  onsubmit="return validateForm()" >
         <input type="hidden" name="type" value="search">
         <div class="input-group" style="border-radius: 0px !important;">
+        <div class="input-group mb-3">
           <div class="input-group-prepend">
-            <span class="input-group-text date_header"  style="border-bottom-left-radius: 0px !important;">From</span>
+            <span class="input-group-text date_header">From</span>
           </div>
-          <input id="search_from" type="date" name="from" value="<?= $_POST['from'] ?>" class="form-control search_fields" style="border-bottom-right-radius: 0px !important;">
+          <input id="search_from" type="date" name="from" value="<?= $_POST['from'] ?>" class="form-control search_fields">
         </div>
-        <div class="input-group" style="margin-bottom: 1rem!important;">
+
+        <div class="input-group mb-3">
           <div class="input-group-prepend">
-            <span class="input-group-text date_header" style="border-top-left-radius: 0px !important;">To</span>
+            <span class="input-group-text date_header">To</span>
           </div>
-          <input id="search_to" type="date" name="to" value="<?= $_POST['to'] ?>" class="form-control search_fields" style="border-top-right-radius: 0px !important;">
+          <input id="search_to" type="date" name="to" value="<?= $_POST['to'] ?>" class="form-control search_fields">
         </div>
 
         <div class="input-group mb-3">

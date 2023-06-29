@@ -101,6 +101,7 @@ function validateForm(){
     alert("From date must be less than or equal to To date.");
     return false;
   }
+  return true;
 }
 
 function exportCSV(){
