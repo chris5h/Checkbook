@@ -207,7 +207,7 @@ function searchTrans($arr){
 
 function getSchedule(){
     global $link;
-    $sql = "SELECT * FROM allschedules";
+    $sql = "SELECT * FROM allschedules ORDER BY dayofmonth";
     if($stmt = mysqli_prepare($link, $sql)){
         if(mysqli_stmt_execute($stmt)){
             $result = mysqli_stmt_get_result($stmt);
