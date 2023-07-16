@@ -39,6 +39,17 @@ $balance = getBalance();
       font-size: 125%;
       font-weight: bold;
     }
+    .positive_sub {
+      color: darkgreen;
+      font-size: 110%;
+      font-style: italic;
+    }
+    .negative_sub {
+      color: darkred;
+      font-size: 110%;
+      font-style: italic;
+    }
+    
     .trans_row{
       cursor: pointer;
     }
@@ -61,7 +72,7 @@ $balance = getBalance();
 <br>
 <div class="card" id = "nav_card">
   <div class="card-header" style="padding: 0px; padding-left: 10px;"><h4 class="card-title">Account Overview</h4></div>
-  <div class="card-body"   style="padding: 0px; padding-left: 10px;">Balance: <span class="<?= $balance < 0 ? 'negative' : 'positive' ?>"><?= '$'.number_format($balance,2,'.',',') ?></span></div>
+  <div class="card-body"   style="padding: 0px; padding-left: 10px;">Balance: <?= $balance ?></div>
     <div class="card-footer"><div class="btn-group input-group" role="group">
       <button class="btn btn-outline-primary nav_bar" onclick="window.location = window.location['href']"> 🏠 Home </button>
       <button class="btn btn-outline-dark nav_bar" onclick="newTrans()"> ➕ Add </button>

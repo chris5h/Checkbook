@@ -22,16 +22,37 @@ function insertTrans($date, $desc, $amount, $type, $checknumber){
 
 function getBalance(){
     global $link;
-    $sql = 'select sum(amount) "Amount" from transactions';
+    $balance = "";
+    $postdates = 0;
+    $subtotal = "";
+    $sql = 'SELECT 
+        sum(amount) "Amount"
+        ,SUM(IF(trans_date > CURDATE(), 1, 0)) "postdates" 
+        ,SUM(IF(trans_date <= CURDATE(), amount, 0)) "Subtotal"
+    from transactions';
     if($stmt = mysqli_prepare($link, $sql)){
         if(mysqli_stmt_execute($stmt)){
             $result = mysqli_stmt_get_result($stmt);
             while ($row = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
-                return $row['Amount'];
+                $balance = $row['Amount'];
+                $postdates = $row['postdates'];
+                $subtotal = $row['Subtotal'];
+                
             }
         }
     }
+    $class = ($balance < 0 ? 'negative' : 'positive');
+    $total = number_format($balance,2,'.',',');
+    $rtn = '<span class="'.$class.'">$'.$total.'</span>';
+    if($postdates > 0){
+        $val = number_format($subtotal,2,'.',',');
+        $class = ($subtotal < 0 ? 'negative_sub' : 'positive_sub');
+        $rtn .= ' <i><span class="'.$class.'">($'.$val.' subtotal)</span></i>';
+    }
+    return $rtn;
 }
+
+    
 
 
 function get1kTrans(){
