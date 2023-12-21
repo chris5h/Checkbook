@@ -70,7 +70,8 @@ function newTrans(){
   $('#transtitle').html('Add Transaction')
   $('#trans_id').val('');
   $('#amount').val('');
-  $('#date').val(new Date().toISOString().slice(0, 10))
+  var x  = new Date();
+  $('#date').val(x.getFullYear().toString()+'-'+ ((x.getMonth()+1) < 10 ? '0'+(x.getMonth()+1).toString() : (x.getMonth()+1).toString())+'-'+(x.getDate() < 10 ? '0'+x.getDate().toString() : x.getDate().toString()));
   $('#description').val('');
   $('#trans_type').val('withdrawal');
   $('#delete_button').hide();
