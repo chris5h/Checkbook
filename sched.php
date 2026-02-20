@@ -11,169 +11,124 @@ if ($_POST){
 } else  {
   require_once 'calls.php';
   $trans = getSchedule();
-
 }
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Checkbook</title>
+  <title>Checkbook – Schedule</title>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#1a2e1a">
   <link href="icon.png" rel="icon" type="image/x-icon" />
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.23/css/jquery.dataTables.css">  
-  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.23/js/jquery.dataTables.js"></script>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-  <style>
-    .positive {
-      color: darkgreen;
-      font-size: 125%;
-      font-weight: bold;
-    }
-    .negative {
-      color: darkred;
-      font-size: 125%;
-      font-weight: bold;
-    }
-    .trans_row{
-      cursor: pointer;
-    }
-    .ui-autocomplete {
-      z-index: 1510 !important;
-    }
-  </style>
-  <script>
-    $( function() {
-      $( "#description" ).autocomplete({
-        source: 'handler.php',
-        minLength: 2
-      });
-    } );
-  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="cb.css">
 </head>
 <body>
-<div class="container">
-<br>
-<br>
-<div class="card" id = "nav_card">
-  <div class="card-header" style="padding: 0px; padding-left: 10px;"><h4 class="card-title">Scheduled Payments</h4></div>
-    <div class="card-footer">
-      <div class="btn-group input-group" role="group">
-      <button class="btn btn-outline-primary nav_bar" onclick="window.location = '/'"> 🏠 Home </button>
-      <button class="btn btn-outline-dark nav_bar" onclick="newSched()"> ➕ Add </button>
+<div class="app-shell">
+
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="header-brand">
+        <img src="icon.png" alt="Checkbook" class="brand-icon">
+        <span class="brand-name">Scheduled Payments</span>
+      </div>
     </div>
-  </div>
-</div>
-<br>
-<table id="trans_table" class="display" >
-    <thead>
-        <tr>
-          <th>Description</th>
-          <th>Amount</th>
-          <th>Day of Month</th>
-          <th>Next Run</th>
-          <th>Last Run</th>          
-          <th>Enabled</th>
-        </tr>
-    </thead>
+  </header>
 
+  <nav class="bottom-nav">
+    <button class="nav-btn" onclick="window.location = '/'">
+      <span class="nav-icon">🏠</span>
+      <span class="nav-label">Home</span>
+    </button>
+    <button class="nav-btn active" onclick="newSched()">
+      <span class="nav-icon">➕</span>
+      <span class="nav-label">Add</span>
+    </button>
+  </nav>
 
-    <tbody>
-<?
-  if (is_array(($trans))){
-    foreach ($trans as $line){
-        ?>
-        <tr onclick="editSched(<?= $line['id'] ?>)" class="trans_row">
-            <td><?= $line['description'] ?></td>
-            <td class="<?= $line['amount'] < 0 ? 'negative' : 'positive' ?>">$<?= number_format($line['amount'],2,'.',',') ?></td>
-            <td><?= $line['dayofmonth'] ?></td>
-            <td><?= date('m/d/Y', strtotime($line['nextrun'])) ?></td>
-            <td><?= is_null($line['lastrun']) ? '' : date('m/d/Y', strtotime($line['lastrun'])) ?></td>
-            <td><?= $line['active'] == 1 ? '✔️' : '🚫' ?></td>
-        </tr>
-        <?
-    }
-  } else  {
-    print "No records found!";
-  }
-?>
-    </tbody>
-</table>
+  <main class="main-content">
+    <div class="trans-list">
+      <?php
+      if (is_array($trans)) {
+        foreach ($trans as $line) {
+          $isNeg = $line['amount'] < 0;
+          $amtClass = $isNeg ? 'amt-neg' : 'amt-pos';
+          $amtStr = ($isNeg ? '-' : '+') . '$' . number_format(abs($line['amount']), 2, '.', ',');
+          $active = $line['active'] == 1;
+          $nextRun = date('M j', strtotime($line['nextrun']));
+          $lastRun = $line['lastrun'] ? date('M j, Y', strtotime($line['lastrun'])) : 'Never';
+          echo '<div class="sched-row" onclick="editSched(' . $line['id'] . ')">';
+          echo '  <div class="sched-left">';
+          echo '    <span class="sched-desc">' . htmlspecialchars($line['description']) . '</span>';
+          echo '    <span class="sched-meta">Day ' . $line['dayofmonth'] . ' · Next: ' . $nextRun . ' · Last: ' . $lastRun . '</span>';
+          echo '  </div>';
+          echo '  <div class="sched-right">';
+          echo '    <span class="trans-amt ' . $amtClass . '">' . $amtStr . '</span>';
+          echo '    <span class="status-badge ' . ($active ? 'status-active' : 'status-inactive') . '">' . ($active ? 'Active' : 'Off') . '</span>';
+          echo '  </div>';
+          echo '</div>';
+        }
+      } else {
+        echo '<div class="empty-state"><p>No scheduled payments yet.</p></div>';
+      }
+      ?>
+    </div>
+  </main>
 
-<!--  Begin the modal for add/edit transaction  -->
-<div class="modal" id="transModal">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <!-- Modal Header -->
-      <div class="modal-header">
-        <h4 class="modal-title" id="transtitle"></h4>
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-      </div>
-      <!-- Modal body -->
-      <div class="modal-body">
-      <form method="POST">
-      <div class="input-group mb-3">
-        <div class="input-group-prepend">
-            <span class="input-group-text trans_header">Date</span>
+  <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+
+  <!-- Add/Edit Schedule Drawer -->
+  <div class="drawer" id="transDrawer">
+    <div class="drawer-handle" onclick="closeDrawer()"></div>
+    <div class="drawer-header">
+      <h2 class="drawer-title" id="transTitle">Add Schedule</h2>
+      <button class="drawer-close" onclick="closeDrawer()">✕</button>
+    </div>
+    <div class="drawer-body">
+      <form method="POST" id="transForm">
+        <div class="field-group">
+          <label class="field-label">Day of Month</label>
+          <select name="dayofmonth" id="date" class="field-input">
+            <?php for ($x = 1; $x < 29; $x++) echo "<option value=\"$x\">$x</option>"; ?>
+          </select>
         </div>
-        <select name="dayofmonth" id="date" class="form-control">
-          <?php
-            $x = 1;
-            while ($x < 29){
-              ?>
-          <option value="<?= $x ?>"><?= $x ?></option>
-              <?
-              $x++;
-            }
-          ?>
-        </select>
-      </div>
-
-      <div class="input-group mb-3">
-        <div class="input-group-prepend">
-            <span class="input-group-text trans_header">Amount</span>
+        <div class="field-group">
+          <label class="field-label">Amount</label>
+          <div class="amount-input-wrap">
+            <span class="amount-prefix">$</span>
+            <input type="number" id="amount" name="amount" min="0.01" step="0.01" class="field-input amount-input" onchange="$(this).val(Math.abs($(this).val()))" required placeholder="0.00">
+          </div>
         </div>
-        <input type="number" id="amount" name="amount" min="0.01" step="0.01" class="form-control" required onchange="$(this).val(Math.abs($(this).val()))">
-      </div>
-
-      <div class="input-group mb-3">
-        <div class="input-group-prepend">
-            <span class="input-group-text trans_header">Description</span>
+        <div class="field-group">
+          <label class="field-label">Description</label>
+          <input type="text" id="description_sched" name="description" class="field-input" required placeholder="e.g. Netflix, Rent...">
         </div>
-        <input id="description_sched" name="description" class="form-control" required>
-      </div>
-
-      <div class="input-group mb-3">
-        <div class="input-group-prepend">
-            <span class="input-group-text trans_header">Active</span>
+        <div class="field-group">
+          <label class="field-label">Status</label>
+          <div class="toggle-group">
+            <button type="button" class="toggle-btn active" id="btn_active1" onclick="setActive(1)">Active</button>
+            <button type="button" class="toggle-btn" id="btn_active0" onclick="setActive(0)">Inactive</button>
+          </div>
+          <input type="hidden" id="active" name="active" value="1">
         </div>
-        <select name="active" id="active" class="form-control" required>
-          <option value="1">Active</option>
-          <option value="0">Inactive</option>
-        </select>
-      </div>            
-
-      <input type="hidden" id="trans_id" name="trans_id">
-      <input type="hidden" id="type" name="type">
-      <br>
-      </div>
-
-      <!-- Modal footer -->
-      <div class="modal-footer">
-        <input type="submit" id="button" class="btn btn-primary buttongrp">
-        <button type="button" id="delete_button" class="btn btn-danger buttongrp"  onclick="var x =  confirm('Are you sure?'); if (x){delSched();return false;}">Delete</button>
-        <button type="button"  class="btn btn-danger buttongrp" data-dismiss="modal">Close</button>      
-      </div>
+        <input type="hidden" id="trans_id" name="trans_id">
+        <input type="hidden" id="type" name="type">
+        <div class="drawer-actions">
+          <button type="submit" id="submitBtn" class="btn-primary">Add Schedule</button>
+          <button type="button" id="deleteBtn" class="btn-danger" style="display:none" onclick="confirmDeleteSched()">Delete</button>
+        </div>
       </form>
-
     </div>
   </div>
-</div>
 
+</div>
 
 <script src="cb.js"></script>
 </body>

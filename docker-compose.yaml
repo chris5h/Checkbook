@@ -1,0 +1,17 @@
+services:
+  checkbook:
+    build: .
+    container_name: checkbook_app
+    ports:
+      - "8080:80"
+    environment:
+      DB_SERVER:   ${DB_SERVER}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME:     ${DB_NAME}
+    # Remove the network block below if your MySQL is on a remote host
+    # (e.g. a managed cloud DB). Only needed if MySQL is also running
+    # locally in Docker on the same machine.
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
