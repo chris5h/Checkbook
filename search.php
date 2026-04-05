@@ -1,4 +1,5 @@
-<?
+<?php
+require_once 'auth_guard.php';
 require_once 'calls.php';
 $trans = searchTrans([$_POST['from'],	$_POST['to'],	$_POST['low'],	$_POST['high'],	$_POST['description'], $_POST['check_low'], $_POST['check_high']]);
 $f = fopen('php://memory', 'w');

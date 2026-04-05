@@ -1,3 +1,33 @@
+-- ── Users ────────────────────────────────────────────────────────────────────
+CREATE TABLE `users` (
+  `id`            INT NOT NULL AUTO_INCREMENT,
+  `username`      VARCHAR(64) NOT NULL,
+  `password_hash` VARCHAR(255) NOT NULL,
+  `created_dt`    DATETIME NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `username_idx` (`username`)
+);
+
+-- ── WebAuthn credentials (for biometric login) ────────────────────────────
+CREATE TABLE `webauthn_credentials` (
+  `id`            INT NOT NULL AUTO_INCREMENT,
+  `user_id`       INT NOT NULL,
+  `credential_id` VARCHAR(1024) NOT NULL,
+  `public_key`    TEXT NOT NULL,
+  `sign_count`    INT NOT NULL DEFAULT 0,
+  `created_dt`    DATETIME NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `credential_id_idx` (`credential_id`(255)),
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
+);
+
+-- ── Migration (if upgrading from single-user schema) ─────────────────────
+-- ALTER TABLE `webauthn_credentials`
+--   ADD COLUMN `user_id` INT NOT NULL AFTER `id`,
+--   ADD FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE;
+-- (truncate webauthn_credentials first, then create users, then re-enroll biometrics)
+
+-- ── Transactions ────────────────────────────────────────────────────────────
 CREATE TABLE `transactions` (
 	`id` INT(11) NOT NULL AUTO_INCREMENT,
 	`created_dt` DATETIME NOT NULL DEFAULT current_timestamp(),

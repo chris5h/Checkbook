@@ -1,2 +1,6 @@
-.env
 settings.json
+.vscode/
+node_modules/
+dist/
+*.log
+.claude/

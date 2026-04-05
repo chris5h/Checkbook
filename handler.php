@@ -1,4 +1,5 @@
 <?php
+require_once 'auth_guard.php';
 require_once 'calls.php';
 if ($_GET){
     if (array_key_exists('term', $_GET)){
