@@ -90,7 +90,11 @@ $balance = getBalance();
       <div class="balance-display"><?= $balance ?></div>
       <div class="header-actions">
         <button class="icon-btn" id="bioHeaderBtn" onclick="openBiometricPrompt()" title="Biometric login" style="display:none">🔐</button>
-        <a href="auth.php?action=logout" class="icon-btn" title="Sign out">⏻</a>
+        <a href="auth.php?action=logout" class="icon-btn" title="Sign out">
+  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/>
+  </svg>
+</a>
       </div>
     </div>
   </header>

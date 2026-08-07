@@ -46,7 +46,8 @@ html, body {
 .app-shell {
   display: flex;
   flex-direction: column;
-  height: 100dvh;
+  height: 100vh;   /* fallback */
+  height: 100%;    /* resolves against html/body, correct in standalone PWA */
   overflow: hidden;
   position: relative;
 }

@@ -2,7 +2,7 @@
    Checkbook — Service Worker
    ============================================= */
 
-const CACHE = 'checkbook-v1';
+const CACHE = 'checkbook-v3';
 
 // Static assets to pre-cache on install
 const PRECACHE = [
